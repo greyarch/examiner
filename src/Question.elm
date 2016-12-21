@@ -10,12 +10,15 @@ type alias Slug =
     String
 
 
-type alias Model =
-    { slug : Slug
-    , title : String
+type alias Question =
+    { title : String
     , answers : List Answer
     , selected : List Answer
     }
+
+
+type alias Model =
+    ( Slug, Question )
 
 
 type alias Answer =
@@ -29,13 +32,14 @@ type Msg
 
 
 update : Msg -> Model -> Model
-update msg model =
+update msg ( slug, data ) =
     case msg of
-        Select slug answer ->
-            if slug == model.slug then
-                { model | selected = [ answer ] }
-            else
-                model
+        Select slug_ answer ->
+            let
+                newData =
+                    { data | selected = [ answer ] }
+            in
+                ( slug, newData )
 
 
 viewAnswer : String -> Answer -> Html Msg
@@ -61,15 +65,18 @@ viewSelected selected =
 view : Model -> Html Msg
 view question =
     let
+        ( slug, data ) =
+            question
+
         title =
-            Markdown.toHtml [] question.title
+            Markdown.toHtml [] data.title
 
         answers =
             fieldset [] <|
-                List.map (viewAnswer question.slug) question.answers
+                List.map (viewAnswer slug) data.answers
 
         selected =
-            viewSelected question.selected
+            viewSelected data.selected
     in
         div []
             [ title

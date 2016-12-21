@@ -5,12 +5,8 @@ import Html.Events exposing (..)
 import Question
 
 
-type alias SingleQuestion =
-    ( Slug, Question.Model )
-
-
 type alias Model =
-    List SingleQuestion
+    List Question.Model
 
 
 type alias Slug =
@@ -20,16 +16,14 @@ type alias Slug =
 model : Model
 model =
     [ ( "Q1"
-      , Question.Model "Q1"
-            "**First question**"
+      , Question.Question "**First question**"
             [ Question.Answer "First" True
             , Question.Answer "Second" False
             ]
             []
       )
     , ( "Q2"
-      , Question.Model "Q2"
-            "**Second question**"
+      , Question.Question "**Second question**"
             [ Question.Answer "Third" False
             , Question.Answer "Fourth" True
             ]
@@ -51,7 +45,7 @@ update msg model =
 
         SelectQuestion slug qMsg ->
             let
-                qUpdate : SingleQuestion -> SingleQuestion
+                qUpdate : Question.Model -> Question.Model
                 qUpdate sq =
                     let
                         sl =
@@ -61,7 +55,7 @@ update msg model =
                             Tuple.second sq
                     in
                         if slug == sl then
-                            ( sl, Question.update qMsg answ )
+                            Question.update qMsg sq
                         else
                             sq
             in
@@ -78,10 +72,10 @@ view model =
         _ =
             Debug.log "MODEL" model
 
-        qView : ( Slug, Question.Model ) -> Html Msg
-        qView ( slug, q ) =
+        qView : Question.Model -> Html Msg
+        qView q =
             Question.view q
-                |> Html.map (SelectQuestion slug)
+                |> Html.map (SelectQuestion <| Tuple.first q)
 
         questions =
             List.map qView model

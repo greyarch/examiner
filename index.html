@@ -8376,21 +8376,23 @@ var _user$project$Question$viewSelected = function (selected) {
 			selected));
 };
 var _user$project$Question$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		return _elm_lang$core$Native_Utils.eq(_p0._0, model.slug) ? _elm_lang$core$Native_Utils.update(
-			model,
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p2 = msg;
+		var newData = _elm_lang$core$Native_Utils.update(
+			_p1._1,
 			{
 				selected: {
 					ctor: '::',
-					_0: _p0._1,
+					_0: _p2._1,
 					_1: {ctor: '[]'}
 				}
-			}) : model;
+			});
+		return {ctor: '_Tuple2', _0: _p1._0, _1: newData};
 	});
-var _user$project$Question$Model = F4(
-	function (a, b, c, d) {
-		return {slug: a, title: b, answers: c, selected: d};
+var _user$project$Question$Question = F3(
+	function (a, b, c) {
+		return {title: a, answers: b, selected: c};
 	});
 var _user$project$Question$Answer = F2(
 	function (a, b) {
@@ -8439,18 +8441,20 @@ var _user$project$Question$viewAnswer = F2(
 			});
 	});
 var _user$project$Question$view = function (question) {
-	var selected = _user$project$Question$viewSelected(question.selected);
+	var data = _elm_lang$core$Tuple$second(question);
+	var title = A2(
+		_evancz$elm_markdown$Markdown$toHtml,
+		{ctor: '[]'},
+		data.title);
+	var selected = _user$project$Question$viewSelected(data.selected);
+	var slug = _elm_lang$core$Tuple$first(question);
 	var answers = A2(
 		_elm_lang$html$Html$fieldset,
 		{ctor: '[]'},
 		A2(
 			_elm_lang$core$List$map,
-			_user$project$Question$viewAnswer(question.slug),
-			question.answers));
-	var title = A2(
-		_evancz$elm_markdown$Markdown$toHtml,
-		{ctor: '[]'},
-		question.title);
+			_user$project$Question$viewAnswer(slug),
+			data.answers));
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -8484,11 +8488,7 @@ var _user$project$Exam$update = F2(
 			var qUpdate = function (sq) {
 				var answ = _elm_lang$core$Tuple$second(sq);
 				var sl = _elm_lang$core$Tuple$first(sq);
-				return _elm_lang$core$Native_Utils.eq(_p0._0, sl) ? {
-					ctor: '_Tuple2',
-					_0: sl,
-					_1: A2(_user$project$Question$update, _p0._1, answ)
-				} : sq;
+				return _elm_lang$core$Native_Utils.eq(_p0._0, sl) ? A2(_user$project$Question$update, _p0._1, sq) : sq;
 			};
 			return A2(_elm_lang$core$List$map, qUpdate, model);
 		}
@@ -8498,9 +8498,8 @@ var _user$project$Exam$model = {
 	_0: {
 		ctor: '_Tuple2',
 		_0: 'Q1',
-		_1: A4(
-			_user$project$Question$Model,
-			'Q1',
+		_1: A3(
+			_user$project$Question$Question,
 			'**First question**',
 			{
 				ctor: '::',
@@ -8518,9 +8517,8 @@ var _user$project$Exam$model = {
 		_0: {
 			ctor: '_Tuple2',
 			_0: 'Q2',
-			_1: A4(
-				_user$project$Question$Model,
-				'Q2',
+			_1: A3(
+				_user$project$Question$Question,
 				'**Second question**',
 				{
 					ctor: '::',
@@ -8542,15 +8540,15 @@ var _user$project$Exam$SelectQuestion = F2(
 	});
 var _user$project$Exam$Submit = {ctor: 'Submit'};
 var _user$project$Exam$view = function (model) {
-	var qView = function (_p1) {
-		var _p2 = _p1;
+	var qView = function (q) {
 		return A2(
 			_elm_lang$html$Html$map,
-			_user$project$Exam$SelectQuestion(_p2._0),
-			_user$project$Question$view(_p2._1));
+			_user$project$Exam$SelectQuestion(
+				_elm_lang$core$Tuple$first(q)),
+			_user$project$Question$view(q));
 	};
 	var questions = A2(_elm_lang$core$List$map, qView, model);
-	var _p3 = A2(_elm_lang$core$Debug$log, 'MODEL', model);
+	var _p1 = A2(_elm_lang$core$Debug$log, 'MODEL', model);
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
