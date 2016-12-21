@@ -27,33 +27,18 @@ type alias Answer =
     }
 
 
-type Msg
-    = Select Slug Answer
-
-
-update : Msg -> Model -> Model
-update msg ( slug, data ) =
-    case msg of
-        Select slug_ answer ->
-            let
-                newData =
-                    { data | selected = [ answer ] }
-            in
-                ( slug, newData )
-
-
-viewAnswer : String -> Answer -> Html Msg
-viewAnswer grp answer =
+viewAnswer : (Slug -> Answer -> msg) -> String -> Answer -> Html msg
+viewAnswer msg grp answer =
     div []
         [ label []
-            [ input [ type_ "radio", name grp, onClick <| Select grp answer ]
+            [ input [ type_ "radio", name grp, onClick <| msg grp answer ]
                 []
             , text answer.text
             ]
         ]
 
 
-viewSelected : List Answer -> Html Msg
+viewSelected : List Answer -> Html msg
 viewSelected selected =
     div []
         (List.map
@@ -62,8 +47,8 @@ viewSelected selected =
         )
 
 
-view : Model -> Html Msg
-view question =
+view : (Slug -> Answer -> msg) -> Model -> Html msg
+view msg question =
     let
         ( slug, data ) =
             question
@@ -73,7 +58,7 @@ view question =
 
         answers =
             fieldset [] <|
-                List.map (viewAnswer slug) data.answers
+                List.map (viewAnswer msg slug) data.answers
 
         selected =
             viewSelected data.selected

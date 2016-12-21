@@ -34,7 +34,7 @@ model =
 
 type Msg
     = Submit
-    | SelectQuestion Slug Question.Msg
+    | Select Slug Question.Answer
 
 
 update : Msg -> Model -> Model
@@ -43,19 +43,16 @@ update msg model =
         Submit ->
             model
 
-        SelectQuestion slug qMsg ->
+        Select slug answer ->
             let
                 qUpdate : Question.Model -> Question.Model
                 qUpdate sq =
                     let
-                        sl =
-                            Tuple.first sq
-
-                        answ =
-                            Tuple.second sq
+                        ( sl, data ) =
+                            sq
                     in
                         if slug == sl then
-                            Question.update qMsg sq
+                            ( sl, { data | selected = [ answer ] } )
                         else
                             sq
             in
@@ -69,13 +66,9 @@ update msg model =
 view : Model -> Html Msg
 view model =
     let
-        _ =
-            Debug.log "MODEL" model
-
         qView : Question.Model -> Html Msg
         qView q =
-            Question.view q
-                |> Html.map (SelectQuestion <| Tuple.first q)
+            Question.view (Select) q
 
         questions =
             List.map qView model
